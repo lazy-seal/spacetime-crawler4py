@@ -1,6 +1,8 @@
 import re
 from urllib.parse import urlparse
 
+VISITED_URLS = set()
+
 def scraper(url, resp):
     links = extract_next_links(url, resp)
     return [link for link in links if is_valid(link)]
@@ -25,6 +27,25 @@ def is_valid(url):
         parsed = urlparse(url)
         if parsed.scheme not in set(["http", "https"]):
             return False
+
+        # logic:
+        # Check if it's a ICS webpage
+        # Check if we already visited the webpage
+        # Check for robots.txt to see if I'm allowed to crawl this or not.
+        # I might check if we've seen "similar" websites once we have everything.
+
+        # Is it ICS?
+        ics_paths = ("ics.uci.edu", "cs.uci.edu", "informatics.uci.edu", "stat.uci.edu")
+        if parsed.hostname not in ics_paths:
+            return False
+
+        # Have already visited this url?
+        if url in VISITED_URLS:
+            return False
+
+        # check for robots.txt
+        # NeedToImplement
+
         return not re.match(
             r".*\.(css|js|bmp|gif|jpe?g|ico"
             + r"|png|tiff?|mid|mp2|mp3|mp4"

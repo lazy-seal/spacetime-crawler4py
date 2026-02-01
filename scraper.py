@@ -20,6 +20,7 @@ def extract_next_links(url, resp):
 
     urls = []
 
+    # initial check on response
     if resp.status != 200:
         print('connection not successful') # @TODO: handle error
         return urls
@@ -28,13 +29,20 @@ def extract_next_links(url, resp):
 
     content = resp.raw_response.content
 
-    # parsing links
+    # parse the content
     soup = BeautifulSoup(content, 'html.parser')
 
+    # finds all hyperlinks
     for link in soup.find_all('a'):
         href = link.get('href')
         if href and is_valid(href):
+            # @TODO: I might also want to check if the page has a low information value
+            # @TODO: And also check to avoid traps
             urls.append(href)
+
+    # @TODO: word ananlysis
+    #  soup.get_text() # This will give us all the text content
+    #  We can now use our assignment1 code on the text to analyze the word statistics
 
     return urls
 
@@ -43,21 +51,19 @@ def is_valid(url):
     # If you decide to crawl it, return True; otherwise return False.
     # There are already some conditions that return False.
     try:
+
+        # if an empty string, return False
         if not url:
             return False
 
+        # only valid http
         parsed = urlparse(url)
         if parsed.scheme not in set(["http", "https"]):
             return False
 
-        # logic:
-        # Check if it's a ICS webpage
-        # Check if we already visited the webpage
-        # Check for robots.txt to see if I'm allowed to crawl this or not.
-        # I might check if we've seen "similar" websites once we have everything.
-
         # Is it ICS?
         ics_paths = ("ics.uci.edu", "cs.uci.edu", "informatics.uci.edu", "stat.uci.edu")
+        # @TODO: Find more elegant way to do this
         if parsed.hostname and \
                 ics_paths[0] not in parsed.hostname and \
                 ics_paths[1] not in parsed.hostname and \

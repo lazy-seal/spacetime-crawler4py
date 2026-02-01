@@ -22,19 +22,18 @@ def extract_next_links(url, resp):
     if resp.status != 200:
         pass        # @TODO: handle error
 
+    urls = []
     content = resp.raw_response.content
 
-    # beatifulsoup test
+    # parsing links
     soup = BeautifulSoup(content, 'html.parser')
-    with open("test_with_filter.txt", 'w', encoding='utf-8') as f:
-        for link in soup.find_all('a'):
-            href = link.get('href')
-            if href and is_valid(href):
-                print('href: ', href)
-                f.write(href)
-                f.write('\n')
 
-    return list(url)
+    for link in soup.find_all('a'):
+        href = link.get('href')
+        if href and is_valid(href):
+            urls.append(href)
+
+    return urls
 
 def is_valid(url):
     # Decide whether to crawl this url or not. 
@@ -56,7 +55,6 @@ def is_valid(url):
 
         # Is it ICS?
         ics_paths = ("ics.uci.edu", "cs.uci.edu", "informatics.uci.edu", "stat.uci.edu")
-        print(parsed.hostname)
         if ics_paths[0] not in parsed.hostname and \
                 ics_paths[1] not in parsed.hostname and \
                 ics_paths[2] not in parsed.hostname and \

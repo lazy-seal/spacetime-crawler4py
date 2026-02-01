@@ -18,11 +18,14 @@ def extract_next_links(url, resp):
     #         resp.raw_response.content: the content of the page!
     # Return a list with the hyperlinks (as strings) scrapped from resp.raw_response.content
 
+    urls = []
 
     if resp.status != 200:
-        pass        # @TODO: handle error
+        print('connection not successful') # @TODO: handle error
+        return urls
+    elif not resp.raw_response.content:
+        return urls
 
-    urls = []
     content = resp.raw_response.content
 
     # parsing links
@@ -55,7 +58,8 @@ def is_valid(url):
 
         # Is it ICS?
         ics_paths = ("ics.uci.edu", "cs.uci.edu", "informatics.uci.edu", "stat.uci.edu")
-        if ics_paths[0] not in parsed.hostname and \
+        if parsed.hostname and \
+                ics_paths[0] not in parsed.hostname and \
                 ics_paths[1] not in parsed.hostname and \
                 ics_paths[2] not in parsed.hostname and \
                 ics_paths[3] not in parsed.hostname:

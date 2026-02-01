@@ -3,8 +3,6 @@ from urllib.parse import urlparse
 from bs4 import BeautifulSoup
 from pprint import pprint
 
-VISITED_URLS = set()
-
 def scraper(url, resp):
     links = extract_next_links(url, resp)
     return [link for link in links if is_valid(link)]
@@ -19,14 +17,22 @@ def extract_next_links(url, resp):
     #         resp.raw_response.url: the url, again
     #         resp.raw_response.content: the content of the page!
     # Return a list with the hyperlinks (as strings) scrapped from resp.raw_response.content
-    print("TESTING")
-    pprint(resp.raw_response)
 
 
     if resp.status != 200:
         pass        # @TODO: handle error
 
     content = resp.raw_response.content
+
+    # beatifulsoup test
+    soup = BeautifulSoup(content, 'html.parser')
+    with open("test_with_filter.txt", 'w', encoding='utf-8') as f:
+        for link in soup.find_all('a'):
+            href = link.get('href')
+            if href and is_valid(href):
+                print('href: ', href)
+                f.write(href)
+                f.write('\n')
 
     return list(url)
 
@@ -35,6 +41,9 @@ def is_valid(url):
     # If you decide to crawl it, return True; otherwise return False.
     # There are already some conditions that return False.
     try:
+        if not url:
+            return False
+
         parsed = urlparse(url)
         if parsed.scheme not in set(["http", "https"]):
             return False
@@ -47,11 +56,11 @@ def is_valid(url):
 
         # Is it ICS?
         ics_paths = ("ics.uci.edu", "cs.uci.edu", "informatics.uci.edu", "stat.uci.edu")
-        if parsed.hostname not in ics_paths:
-            return False
-
-        # Have already visited this url?
-        if url in VISITED_URLS:
+        print(parsed.hostname)
+        if ics_paths[0] not in parsed.hostname and \
+                ics_paths[1] not in parsed.hostname and \
+                ics_paths[2] not in parsed.hostname and \
+                ics_paths[3] not in parsed.hostname:
             return False
 
         # check for robots.txt

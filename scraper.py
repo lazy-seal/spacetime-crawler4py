@@ -20,7 +20,7 @@ def extract_next_links(url, resp):
     #         resp.raw_response.content: the content of the page!
     # Return a list with the hyperlinks (as strings) scrapped from resp.raw_response.content
     print("TESTING")
-    pprint(resp.raw_respone)
+    pprint(resp.raw_response)
 
 
     if resp.status != 200:

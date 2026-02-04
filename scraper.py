@@ -2,12 +2,36 @@ import re
 from urllib.parse import urlparse
 from bs4 import BeautifulSoup
 from pprint import pprint
+from collections import defaultdict
+
+unique_urls: set[str]               = set()
+unique_subdomains: dict[str, int]   = defaultdict(int)
+word_count: dict[str, int]          = {}
+
+def write_statistics():
+    """Writes statistics required for the report in report.txt"""
+    a = sorted(word_count)
+
+    with open("report.txt", 'w', encoding='utf-8') as file:
+        # 1. how many unique pages did you find?
+        file.write(f"1. Number of Unique URLs: {len(unique_urls)}")
+
+        # 2. 
+
+        # 3. 
+
+        # 4. how many unique subdomains
+        sorted_unique_subdomains = sorted(unique_subdomains.items(), key=lambda item: (item[0], -item[1]))
+        file.write(f"4. Unique Subdomains:")
+        for subdomain, cnt in sorted_unique_subdomains:
+            file.write(f"\t{subdomain}: {cnt}")
+
+
 
 def scraper(url, resp):
     links = extract_next_links(url, resp)
     return [link for link in links if is_valid(link)]
 
-word_count = {}
 
 def tokenize(url, raw_words) -> list:
 
@@ -72,8 +96,6 @@ def extract_next_links(url, resp):
             # @TODO: And also check to avoid traps
             urls.append(href)
 
-    # @TODO: word ananlysis
-    #  soup.get_text() # This will give us all the text content
     paragraph = soup.get_text()
     token_list = tokenize(url, paragraph)
 
@@ -110,7 +132,7 @@ def is_valid(url):
         # check for robots.txt
         # NeedToImplement
 
-        return not re.match(
+        validity = not re.match(
             r".*\.(css|js|bmp|gif|jpe?g|ico"
             + r"|png|tiff?|mid|mp2|mp3|mp4"
             + r"|wav|avi|mov|mpeg|ram|m4v|mkv|ogg|ogv|pdf"
@@ -119,6 +141,14 @@ def is_valid(url):
             + r"|epub|dll|cnf|tgz|sha1"
             + r"|thmx|mso|arff|rtf|jar|csv"
             + r"|rm|smil|wmv|swf|wma|zip|rar|gz)$", parsed.path.lower())
+
+        # getting statistics
+        if validity:
+            unique_urls.add(parsed._replace(fragment='').geturl())
+            if parsed.netloc.endswith('uci.edu'):
+                unique_subdomains[parsed.netloc] += 1
+
+        return validity
 
     except TypeError:
         print ("TypeError for ", parsed)

@@ -14,21 +14,44 @@ def write_statistics():
 
     with open("report.txt", 'w', encoding='utf-8') as file:
         # 1. how many unique pages did you find?
-        file.write(f"1. Number of Unique URLs: {len(unique_urls)}")
+        file.write(f"1. Number of Unique URLs: {len(unique_urls)}\n")
 
         # 2. 
+        file.write(f"2. Longest page: {max(word_count, key=lambda item: item[1])}\n")
 
         # 3. 
 
         # 4. how many unique subdomains
-        sorted_unique_subdomains = sorted(unique_subdomains.items(), key=lambda item: (item[0], -item[1]))
-        file.write(f"4. Unique Subdomains:")
+        sorted_unique_subdomains = sorted(unique_subdomains.items(), key=lambda item: (item[0], item[1]))
+        file.write(f"4. Unique Subdomains:\n")
         for subdomain, cnt in sorted_unique_subdomains:
-            file.write(f"\t{subdomain}: {cnt}")
+            file.write(f"\t{subdomain}: {int(cnt)}\n")
 
 
 
 def scraper(url, resp):
+    # initial check on response
+    if resp.status != 200:
+        print('connection not successful')
+        return []
+    elif not resp.raw_response.content:
+        print('page without content')
+        return []
+
+    # getting wordcount
+    soup = BeautifulSoup(resp.raw_response.content, 'html.parser')
+    paragraph = soup.get_text()
+    token_list = tokenize(url, paragraph)
+
+    # getting statistics
+    parsed = urlparse(url)
+    unique_urls.add(parsed._replace(fragment='').geturl())      # no fragment
+    unique_subdomains[parsed._replace(fragment='').netloc] += 1
+
+    # only visit 100 pages for the test
+    if len(unique_urls) > 100:
+        return []
+
     links = extract_next_links(url, resp)
     return [link for link in links if is_valid(link)]
 
@@ -58,7 +81,7 @@ def tokenize(url, raw_words) -> list:
     return token_list
 
 def printMostWordUrl(word_count):
-    max_url = max(word_count, key=word_count.get)
+    max_url = max(word_count, key=lambda item: item[1])
     max_count = word_count[max_url]
     
     print(f"Max URL: {max_url} with {max_count} words")
@@ -76,16 +99,9 @@ def extract_next_links(url, resp):
 
     urls = []
 
-    # initial check on response
-    if resp.status != 200:
-        print('connection not successful') # @TODO: handle error
-        return urls
-    elif not resp.raw_response.content:
-        return urls
-
     content = resp.raw_response.content
 
-    # parse the content
+    # parse the link
     soup = BeautifulSoup(content, 'html.parser')
 
     # finds all hyperlinks
@@ -93,14 +109,7 @@ def extract_next_links(url, resp):
         href = link.get('href')
         if href and is_valid(href):
             # @TODO: I might also want to check if the page has a low information value
-            # @TODO: And also check to avoid traps
             urls.append(href)
-
-    paragraph = soup.get_text()
-    token_list = tokenize(url, paragraph)
-
-    
-    #  We can now use our assignment1 code on the text to analyze the word statistics
 
     return urls
 
@@ -108,7 +117,7 @@ def is_valid(url):
     # Decide whether to crawl this url or not. 
     # If you decide to crawl it, return True; otherwise return False.
     # There are already some conditions that return False.
-    try:
+    try:    
 
         # if an empty string, return False
         if not url:
@@ -121,7 +130,6 @@ def is_valid(url):
 
         # Is it ICS?
         ics_paths = ("ics.uci.edu", "cs.uci.edu", "informatics.uci.edu", "stat.uci.edu")
-        # @TODO: Find more elegant way to do this
         if parsed.hostname and \
                 ics_paths[0] not in parsed.hostname and \
                 ics_paths[1] not in parsed.hostname and \
@@ -129,28 +137,37 @@ def is_valid(url):
                 ics_paths[3] not in parsed.hostname:
             return False
 
+        
+        # links to avoid 
+        traps = ('isg.ics.uci.edu/events/tag/talk',)
+        for trap in traps:
+            if trap in parsed.geturl():
+                return False
+        
+        # avoidng textbook because we don't really need all textbook content from information retreival perspective
+        textbooks = ('www.ics.uci.edu/~wjohnson/BIDA',)
+        for textbook in textbooks:
+            if textbook in parsed.geturl():
+                return False
+
+        # '.edu/people/...' always gives 608 and is redundant with '.edu/?people=...'
+        if 'ics.uci.edu/people/' in parsed.geturl():
+            return False
+
         # check for robots.txt
         # NeedToImplement
 
-        validity = not re.match(
-            r".*\.(css|js|bmp|gif|jpe?g|ico"
-            + r"|png|tiff?|mid|mp2|mp3|mp4"
-            + r"|wav|avi|mov|mpeg|ram|m4v|mkv|ogg|ogv|pdf"
-            + r"|ps|eps|tex|ppt|pptx|doc|docx|xls|xlsx|names"
-            + r"|data|dat|exe|bz2|tar|msi|bin|7z|psd|dmg|iso"
-            + r"|epub|dll|cnf|tgz|sha1"
-            + r"|thmx|mso|arff|rtf|jar|csv"
-            + r"|rm|smil|wmv|swf|wma|zip|rar|gz)$", parsed.path.lower())
-
-        # getting statistics
-        if validity:
-            unique_urls.add(parsed._replace(fragment='').geturl())
-            if parsed.netloc.endswith('uci.edu'):
-                unique_subdomains[parsed.netloc] += 1
-
-        return validity
-
-    except TypeError:
-        print ("TypeError for ", parsed)
-        raise
+        return not re.match(
+                    r".*\.(css|js|bmp|gif|jpe?g|ico"
+                    + r"|png|tiff?|mid|mp2|mp3|mp4"
+                    + r"|wav|avi|mov|mpeg|ram|m4v|mkv|ogg|ogv|pdf"
+                    + r"|ps|eps|tex|ppt|pptx|doc|docx|xls|xlsx|names"
+                    + r"|data|dat|exe|bz2|tar|msi|bin|7z|psd|dmg|iso"
+                    + r"|epub|dll|cnf|tgz|sha1"
+                    + r"|thmx|mso|arff|rtf|jar|csv"
+                    + r"|rm|smil|wmv|swf|wma|zip|rar|gz)$", parsed.path.lower())
+    except Exception as e:
+        print ("Error for ", parsed)
+        print(e)
+        return False
 

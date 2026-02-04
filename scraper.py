@@ -7,6 +7,38 @@ def scraper(url, resp):
     links = extract_next_links(url, resp)
     return [link for link in links if is_valid(link)]
 
+word_count = {}
+
+def tokenize(url, raw_words) -> list:
+
+    #lowercase all char to be lowercase to deal with edge cases
+    lowercase = raw_words.casefold()
+    
+    token_list = []
+    tmp_word = []
+
+    #check current char for valid alpha-numerical, then add it to tmp list until non-valid char. Then add complete string to list
+    for char in lowercase:
+        if char.isascii() and char.isalnum():
+            tmp_word.append(char)
+        elif char == "'" or char == "-":
+            continue
+        else:
+            if tmp_word:
+                new_word = "".join(tmp_word)
+                token_list.append(new_word)
+                tmp_word = []
+                
+    word_count[url] = len(token_list)
+    
+    return token_list
+
+def printMostWordUrl(word_count):
+    max_url = max(word_count, key=word_count.get)
+    max_count = word_count[max_url]
+    
+    print(f"Max URL: {max_url} with {max_count} words")
+        
 def extract_next_links(url, resp):
     # Implementation required.
     # url: the URL that was used to get the page
@@ -42,6 +74,10 @@ def extract_next_links(url, resp):
 
     # @TODO: word ananlysis
     #  soup.get_text() # This will give us all the text content
+    paragraph = soup.get_text()
+    token_list = tokenize(url, paragraph)
+
+    
     #  We can now use our assignment1 code on the text to analyze the word statistics
 
     return urls
@@ -87,3 +123,4 @@ def is_valid(url):
     except TypeError:
         print ("TypeError for ", parsed)
         raise
+

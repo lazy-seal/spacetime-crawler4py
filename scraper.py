@@ -3,10 +3,18 @@ from urllib.parse import urlparse
 from bs4 import BeautifulSoup
 from pprint import pprint
 from collections import defaultdict
+import json
 
 unique_urls: set[str]               = set()
 unique_subdomains: dict[str, int]   = defaultdict(int)
+prohibited_paths: dict[str, list[str]]            = {}        # decorate each subdomain with its disallowed paths get from the robots.txt
 word_count: dict[str, int]          = {}
+
+def initialize_statistics():
+    """initializes statistic variables from report.json file"""
+    # read json
+    # initialize the four stats variables
+    pass
 
 def write_statistics():
     """Writes statistics required for the report in report.txt"""
@@ -155,7 +163,16 @@ def is_valid(url):
             return False
 
         # check for robots.txt
-        # NeedToImplement
+        # @TODO Implement this
+        if parsed.netloc not in prohibited_paths:
+            # parse parsed.netloc + '/robots.txt/'
+            # some logic to process parsed robots.txt
+            # allowed[parsed.netloc] = # list of disalllowed paths?
+            pass
+        else:
+            for path in prohibited_paths[parsed.netloc]:
+                if path in parsed.geturl():
+                    return False
 
         return not re.match(
                     r".*\.(css|js|bmp|gif|jpe?g|ico"

@@ -3,31 +3,36 @@ from urllib.parse import urlparse
 from bs4 import BeautifulSoup
 from pprint import pprint
 from collections import defaultdict
-import json
 
+stopwords = set(('I', 'a', 'about', 'an', 'are', 'as', 'at', 'by',
+             'com', 'for', 'from', 'how', 'in', 'is', 'it', 'of',
+             'on', 'that', 'the', 'this', 'to', 'was', 'what', 'when',
+             'where', 'who', 'will', 'with', 'with', 'the', 'www'))
 unique_urls: set[str]               = set()
 unique_subdomains: dict[str, int]   = defaultdict(int)
-prohibited_paths: dict[str, list[str]]            = {}        # decorate each subdomain with its disallowed paths get from the robots.txt
-word_count: dict[str, int]          = {}
-
-def initialize_statistics():
-    """initializes statistic variables from report.json file"""
-    # read json
-    # initialize the four stats variables
-    pass
+prohibited_paths: dict[str, list[str]]            = {}
+word_count: dict[str, int]          = defaultdict(int)
+longest_page: list                  = ['', 0]     # [url, number of words]
 
 def write_statistics():
     """Writes statistics required for the report in report.txt"""
-    a = sorted(word_count)
+    top_words = sorted(word_count, key=lambda item: item[1], reverse=True)
 
     with open("report.txt", 'w', encoding='utf-8') as file:
         # 1. how many unique pages did you find?
         file.write(f"1. Number of Unique URLs: {len(unique_urls)}\n")
 
         # 2. 
-        file.write(f"2. Longest page: {max(word_count, key=lambda item: item[1])}\n")
+        file.write(f"2. Longest page: {longest_page[0], longest_page[1]}\n")
 
         # 3. 
+        file.write(f"3. 100 most common words:\n")
+        i = 0
+        for word in top_words:
+            i += 1
+            file.write(f"\t{word}: {word_count[word]}\n")
+            if i >= 100:
+                break
 
         # 4. how many unique subdomains
         sorted_unique_subdomains = sorted(unique_subdomains.items(), key=lambda item: (item[0], item[1]))
@@ -51,21 +56,21 @@ def scraper(url, resp):
     paragraph = soup.get_text()
     token_list = tokenize(url, paragraph)
 
+    # page length
+    if len(token_list) > longest_page[1]:
+        longest_page[0] = url
+        longest_page[1] = len(token_list)
+
     # getting statistics
     parsed = urlparse(url)
     unique_urls.add(parsed._replace(fragment='').geturl())      # no fragment
     unique_subdomains[parsed._replace(fragment='').netloc] += 1
 
-    # only visit 100 pages for the test
-    if len(unique_urls) > 100:
-        return []
-
     links = extract_next_links(url, resp)
     return [link for link in links if is_valid(link)]
 
 
-def tokenize(url, raw_words) -> list:
-
+def tokenize(url, raw_words) -> list[str]:
     #lowercase all char to be lowercase to deal with edge cases
     lowercase = raw_words.casefold()
     
@@ -74,26 +79,20 @@ def tokenize(url, raw_words) -> list:
 
     #check current char for valid alpha-numerical, then add it to tmp list until non-valid char. Then add complete string to list
     for char in lowercase:
-        if char.isascii() and char.isalnum():
+        if char.isalnum():
             tmp_word.append(char)
         elif char == "'" or char == "-":
             continue
         else:
             if tmp_word:
                 new_word = "".join(tmp_word)
-                token_list.append(new_word)
-                tmp_word = []
-                
-    word_count[url] = len(token_list)
-    
+                if new_word not in stopwords:
+                    token_list.append(new_word)
+                    word_count[new_word] += 1
+                    tmp_word = []
+
     return token_list
 
-def printMostWordUrl(word_count):
-    max_url = max(word_count, key=lambda item: item[1])
-    max_count = word_count[max_url]
-    
-    print(f"Max URL: {max_url} with {max_count} words")
-        
 def extract_next_links(url, resp):
     # Implementation required.
     # url: the URL that was used to get the page
@@ -116,7 +115,6 @@ def extract_next_links(url, resp):
     for link in soup.find_all('a'):
         href = link.get('href')
         if href and is_valid(href):
-            # @TODO: I might also want to check if the page has a low information value
             urls.append(href)
 
     return urls
@@ -145,34 +143,28 @@ def is_valid(url):
                 ics_paths[3] not in parsed.hostname:
             return False
 
-        
-        # links to avoid 
-        traps = ('isg.ics.uci.edu/events/tag/talk',)
+        # traps to avoid 
+        traps = ('isg.ics.uci.edu/events/tag/talk',
+                 'gitlab.ics', 
+                 'grape.ics',
+                 '/events/',)
         for trap in traps:
             if trap in parsed.geturl():
                 return False
-        
-        # avoidng textbook because we don't really need all textbook content from information retreival perspective
-        textbooks = ('www.ics.uci.edu/~wjohnson/BIDA',)
+
+        # avoid gitlab repo
+        if 'gitlab.ics.uci.edu' in parsed.geturl:
+            return False
+
+        # low value info like textbook
+        textbooks = ('www.ics.uci.edu/~wjohnson/BIDA','ngs.ics.edu/author/')
         for textbook in textbooks:
             if textbook in parsed.geturl():
                 return False
 
-        # '.edu/people/...' always gives 608 and is redundant with '.edu/?people=...'
+        # ignore people (these gave errors)
         if 'ics.uci.edu/people/' in parsed.geturl():
             return False
-
-        # check for robots.txt
-        # @TODO Implement this
-        if parsed.netloc not in prohibited_paths:
-            # parse parsed.netloc + '/robots.txt/'
-            # some logic to process parsed robots.txt
-            # allowed[parsed.netloc] = # list of disalllowed paths?
-            pass
-        else:
-            for path in prohibited_paths[parsed.netloc]:
-                if path in parsed.geturl():
-                    return False
 
         return not re.match(
                     r".*\.(css|js|bmp|gif|jpe?g|ico"

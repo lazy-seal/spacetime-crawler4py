@@ -164,7 +164,7 @@ def is_valid(url):
                 return False
 
         # avoid gitlab repo
-        if 'gitlab.ics.uci.edu' in parsed.geturl:
+        if 'gitlab.ics.uci.edu' in parsed.geturl():
             return False
 
         # low value info like textbook

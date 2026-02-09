@@ -18,7 +18,7 @@ longest_page: list                  = ['', 0]     # [url, number of words]
 
 def write_statistics():
     """Writes statistics required for the report in report.txt"""
-    top_words = sorted(word_count, key=lambda item: item[1], reverse=True)
+    top_words = sorted(word_count.items(), key=lambda item: item[1], reverse=True)
 
     with open("report.txt", 'w', encoding='utf-8') as file:
         # 1. how many unique pages did you find?
@@ -72,10 +72,6 @@ def scraper(url, resp):
     # getting statistics
     unique_urls.add(parsed._replace(fragment='').geturl())      # no fragment
     unique_subdomains[parsed._replace(fragment='').netloc] += 1
-
-    # only visit 10 pages for the test
-    if len(unique_urls) > 10:
-        return []
 
     links = extract_next_links(url, resp)
     return [link for link in links if is_valid(link)]

@@ -4,10 +4,15 @@ from bs4 import BeautifulSoup
 from pprint import pprint
 from collections import defaultdict
 
+<<<<<<< HEAD
 stopwords = set(('I', 'a', 'about', 'an', 'are', 'as', 'at', 'by',
              'com', 'for', 'from', 'how', 'in', 'is', 'it', 'of',
              'on', 'that', 'the', 'this', 'to', 'was', 'what', 'when',
              'where', 'who', 'will', 'with', 'with', 'the', 'www'))
+=======
+from pprint import pprint
+
+>>>>>>> 2586d48 (this shouldn't come up again)
 unique_urls: set[str]               = set()
 unique_subdomains: dict[str, int]   = defaultdict(int)
 prohibited_paths: dict[str, list[str]]            = {}
@@ -40,6 +45,9 @@ def write_statistics():
         for subdomain, cnt in sorted_unique_subdomains:
             file.write(f"\t{subdomain}: {int(cnt)}\n")
 
+        # for test
+        pprint(word_count)
+
 
 
 def scraper(url, resp):
@@ -51,10 +59,13 @@ def scraper(url, resp):
         print('page without content')
         return []
 
+    parsed = urlparse(url)
+
     # getting wordcount
     soup = BeautifulSoup(resp.raw_response.content, 'html.parser')
     paragraph = soup.get_text()
-    token_list = tokenize(url, paragraph)
+    print(parsed.geturl())
+    token_list = tokenize(parsed.geturl(), paragraph)
 
     # page length
     if len(token_list) > longest_page[1]:
@@ -62,10 +73,16 @@ def scraper(url, resp):
         longest_page[1] = len(token_list)
 
     # getting statistics
-    parsed = urlparse(url)
     unique_urls.add(parsed._replace(fragment='').geturl())      # no fragment
     unique_subdomains[parsed._replace(fragment='').netloc] += 1
 
+<<<<<<< HEAD
+=======
+    # only visit 10 pages for the test
+    if len(unique_urls) > 10:
+        return []
+
+>>>>>>> 2586d48 (this shouldn't come up again)
     links = extract_next_links(url, resp)
     return [link for link in links if is_valid(link)]
 

@@ -1,0 +1,295 @@
+1. Number of Unique URLs: 9225
+2. Longest page: ('http://www.ics.uci.edu/~cs224', 77116)
+3. 200 most common words:
+	('s', 40606): 0
+	('research', 32172): 0
+	('i', 25037): 0
+	('student', 19415): 0
+	('2018', 18549): 0
+	('we', 17907): 0
+	('d', 16862): 0
+	('ramesh', 16416): 0
+	('2019', 15819): 0
+	('2023', 15095): 0
+	('students', 14948): 0
+	('computer', 14850): 0
+	('2021', 14838): 0
+	('2020', 14726): 0
+	('information', 14551): 0
+	('b', 14400): 0
+	('graduate', 14323): 0
+	('2022', 14273): 0
+	('undergraduate', 14210): 0
+	('software', 14118): 0
+	('2017', 13855): 0
+	('2016', 13394): 0
+	('may', 13319): 0
+	('informatics', 13274): 0
+	('2015', 13056): 0
+	('t', 13048): 0
+	('news', 13033): 0
+	('m', 12673): 0
+	('ics', 12651): 0
+	('engineering', 12605): 0
+	('e', 11755): 0
+	('june', 11698): 0
+	('more', 11631): 0
+	('september', 11547): 0
+	('science', 11375): 0
+	('july', 11370): 0
+	('data', 11245): 0
+	('august', 10754): 0
+	('january', 10728): 0
+	('march', 10696): 0
+	('be', 10593): 0
+	('april', 10589): 0
+	('october', 10522): 0
+	('november', 10451): 0
+	('february', 10372): 0
+	('uci', 10262): 0
+	('december', 10207): 0
+	('us', 10126): 0
+	('courses', 9999): 0
+	('n', 9967): 0
+	('your', 9952): 0
+	('department', 9880): 0
+	('learning', 9878): 0
+	('ph', 9832): 0
+	('have', 9806): 0
+	('events', 9737): 0
+	('projects', 9729): 0
+	('university', 9613): 0
+	('read', 9502): 0
+	('2025', 9485): 0
+	('you', 9470): 0
+	('o', 9350): 0
+	('people', 9304): 0
+	('books', 9288): 0
+	('past', 9179): 0
+	('current', 8921): 0
+	('jain', 8854): 0
+	('design', 8732): 0
+	('l', 8691): 0
+	('our', 8628): 0
+	('search', 8521): 0
+	('irvine', 8480): 0
+	('computing', 8380): 0
+	('or', 8287): 0
+	('has', 7902): 0
+	('alumni', 7804): 0
+	('p', 7698): 0
+	('wics', 7551): 0
+	('faculty', 7521): 0
+	('community', 7518): 0
+	('1', 7475): 0
+	('systems', 7321): 0
+	('2', 7198): 0
+	('profiles', 7131): 0
+	('r', 7054): 0
+	('can', 6950): 0
+	('spotlights', 6789): 0
+	('all', 6779): 0
+	('2014', 6754): 0
+	('c', 6665): 0
+	('new', 6522): 0
+	('support', 6460): 0
+	('their', 6326): 0
+	('contact', 6291): 0
+	('not', 6139): 0
+	('management', 6017): 0
+	('10', 5973): 0
+	('application', 5942): 0
+	('school', 5911): 0
+	('master', 5907): 0
+	('vision', 5825): 0
+	('process', 5810): 0
+	('future', 5682): 0
+	('program', 5494): 0
+	('x', 5447): 0
+	('post', 5446): 0
+	('code', 5432): 0
+	('uc', 5409): 0
+	('outreach', 5404): 0
+	('degrees', 5353): 0
+	('my', 5284): 0
+	('one', 5210): 0
+	('but', 5200): 0
+	('groups', 5195): 0
+	('blogs', 5122): 0
+	('companies', 5021): 0
+	('3', 5011): 0
+	('u', 5006): 0
+	('professor', 4996): 0
+	('policies', 4993): 0
+	('machine', 4973): 0
+	('seminar', 4958): 0
+	('statistics', 4929): 0
+	('time', 4892): 0
+	('social', 4851): 0
+	('series', 4780): 0
+	('game', 4763): 0
+	('they', 4748): 0
+	('opportunities', 4747): 0
+	('wordpress', 4724): 0
+	('technology', 4703): 0
+	('4', 4654): 0
+	('conference', 4650): 0
+	('content', 4620): 0
+	('site', 4609): 0
+	('california', 4540): 0
+	('f', 4536): 0
+	('sciences', 4525): 0
+	('history', 4521): 0
+	('no', 4476): 0
+	('he', 4476): 0
+	('media', 4458): 0
+	('h', 4453): 0
+	('navigation', 4439): 0
+	('experiential', 4366): 0
+	('also', 4358): 0
+	('g', 4346): 0
+	('share', 4346): 0
+	('impact', 4344): 0
+	('y', 4339): 0
+	('theme', 4322): 0
+	('work', 4300): 0
+	('center', 4284): 0
+	('6', 4257): 0
+	('favorite', 4255): 0
+	('week', 4249): 0
+	('5', 4228): 0
+	('pm', 4226): 0
+	('log', 4225): 0
+	('w', 4218): 0
+	('corporate', 4215): 0
+	('comments', 4205): 0
+	('education', 4184): 0
+	('â', 4172): 0
+	('skip', 4025): 0
+	('health', 4021): 0
+	('0', 3992): 0
+	('bren', 3985): 0
+	('home', 3979): 0
+	('professional', 3927): 0
+	('j', 3912): 0
+	('project', 3891): 0
+	('some', 3881): 0
+	('business', 3877): 0
+	('so', 3861): 0
+	('applications', 3821): 0
+	('innovate', 3821): 0
+	('2024', 3817): 0
+	('do', 3816): 0
+	('8', 3812): 0
+	('life', 3765): 0
+	('k', 3694): 0
+	('areas', 3666): 0
+	('admissions', 3651): 0
+	('multimedia', 3647): 0
+	('which', 3636): 0
+	('been', 3632): 0
+	('v', 3613): 0
+	('access', 3591): 0
+	('these', 3586): 0
+	('donald', 3545): 0
+	('his', 3544): 0
+	('map', 3486): 0
+	('7', 3463): 0
+	('powered', 3461): 0
+	('there', 3458): 0
+	('like', 3452): 0
+	('many', 3425): 0
+	('chair', 3423): 0
+	('using', 3400): 0
+4. Unique Subdomains:
+	('accessibility.ics.uci.edu', 1)
+	('acoi.ics.uci.edu', 118)
+	('aiclub.ics.uci.edu', 1)
+	('archive-beta.ics.uci.edu', 1)
+	('archive.ics.uci.edu', 3)
+	('asterix.ics.uci.edu', 2)
+	('capstone.cs.uci.edu', 8)
+	('cert.ics.uci.edu', 1)
+	('chenli.ics.uci.edu', 3)
+	('cloudberry.ics.uci.edu', 43)
+	('cml.ics.uci.edu', 201)
+	('code.ics.uci.edu', 14)
+	('computableplant.ics.uci.edu', 11)
+	('courselisting.ics.uci.edu', 5)
+	('create.ics.uci.edu', 3)
+	('cs.ics.uci.edu', 12)
+	('cs.uci.edu', 1)
+	('cwicsocal18.ics.uci.edu', 12)
+	('cyberclub.ics.uci.edu', 1)
+	('dgillen.ics.uci.edu', 32)
+	('ds4all.ics.uci.edu', 5)
+	('duttgroup.ics.uci.edu', 148)
+	('edgelab.ics.uci.edu', 6)
+	('emj.ics.uci.edu', 45)
+	('evoke.ics.uci.edu', 2)
+	('flamingo.ics.uci.edu', 8)
+	('fr.ics.uci.edu', 3)
+	('futurehealth.ics.uci.edu', 4)
+	('graphics.ics.uci.edu', 1)
+	('graphmod.ics.uci.edu', 1)
+	('hack.ics.uci.edu', 2)
+	('hai.ics.uci.edu', 1)
+	('hobbes.ics.uci.edu', 1)
+	('hpi.ics.uci.edu', 5)
+	('icde2023.ics.uci.edu', 46)
+	('ics.uci.edu', 1056)
+	('industryshowcase.ics.uci.edu', 22)
+	('informatics.ics.uci.edu', 1)
+	('informatics.uci.edu', 1)
+	('insite.ics.uci.edu', 1)
+	('intranet.ics.uci.edu', 4)
+	('ipubmed.ics.uci.edu', 1)
+	('isg.ics.uci.edu', 291)
+	('jgarcia.ics.uci.edu', 40)
+	('luci.ics.uci.edu', 3)
+	('mailman.ics.uci.edu', 3)
+	('malek.ics.uci.edu', 1)
+	('mcs.ics.uci.edu', 12)
+	('mdogucu.ics.uci.edu', 1)
+	('mds.ics.uci.edu', 8)
+	('mhcid.ics.uci.edu', 16)
+	('mswe.ics.uci.edu', 11)
+	('nalini.ics.uci.edu', 7)
+	('newport.eecs.uci.edu', 1)
+	('ngs.ics.uci.edu', 3042)
+	('oai.ics.uci.edu', 5)
+	('physics.uci.edu', 3)
+	('plrg.eecs.uci.edu', 10)
+	('plrg.ics.uci.edu', 84)
+	('psearch.ics.uci.edu', 1)
+	('redmiles.ics.uci.edu', 1)
+	('riscit.ics.uci.edu', 1)
+	('seal.ics.uci.edu', 3)
+	('sherlock.ics.uci.edu', 1)
+	('stairs.ics.uci.edu', 1)
+	('stat.ics.uci.edu', 11)
+	('stat.uci.edu', 1)
+	('statconsulting.ics.uci.edu', 4)
+	('student-council.ics.uci.edu', 1)
+	('summeracademy.ics.uci.edu', 6)
+	('support.ics.uci.edu', 1)
+	('swiki.ics.uci.edu', 1)
+	('tad.ics.uci.edu', 1)
+	('tastier.ics.uci.edu', 1)
+	('tutoring.ics.uci.edu', 5)
+	('ugradforms.ics.uci.edu', 1)
+	('unite.ics.uci.edu', 10)
+	('vision.ics.uci.edu', 5)
+	('wics.ics.uci.edu', 1884)
+	('wiki.ics.uci.edu', 4)
+	('www-db.ics.uci.edu', 11)
+	('www.cecs.uci.edu', 26)
+	('www.cs.uci.edu', 5)
+	('www.economics.uci.edu', 1)
+	('www.eecs.uci.edu', 1)
+	('www.ics.uci.edu', 395)
+	('www.informatics.ics.uci.edu', 1)
+	('www.informatics.uci.edu', 1166)
+	('www.physics.uci.edu', 61)
+	('www.stat.uci.edu', 233)
+	('xtune.ics.uci.edu', 6)

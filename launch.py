@@ -19,7 +19,6 @@ def main(config_file, restart):
         write_statistics()
 
 
-
 if __name__ == "__main__":
     parser = ArgumentParser()
     parser.add_argument("--restart", action="store_true", default=False)

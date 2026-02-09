@@ -4,15 +4,12 @@ from bs4 import BeautifulSoup
 from pprint import pprint
 from collections import defaultdict
 
-<<<<<<< HEAD
 stopwords = set(('I', 'a', 'about', 'an', 'are', 'as', 'at', 'by',
              'com', 'for', 'from', 'how', 'in', 'is', 'it', 'of',
              'on', 'that', 'the', 'this', 'to', 'was', 'what', 'when',
              'where', 'who', 'will', 'with', 'with', 'the', 'www'))
-=======
 from pprint import pprint
 
->>>>>>> 2586d48 (this shouldn't come up again)
 unique_urls: set[str]               = set()
 unique_subdomains: dict[str, int]   = defaultdict(int)
 prohibited_paths: dict[str, list[str]]            = {}
@@ -76,13 +73,10 @@ def scraper(url, resp):
     unique_urls.add(parsed._replace(fragment='').geturl())      # no fragment
     unique_subdomains[parsed._replace(fragment='').netloc] += 1
 
-<<<<<<< HEAD
-=======
     # only visit 10 pages for the test
     if len(unique_urls) > 10:
         return []
 
->>>>>>> 2586d48 (this shouldn't come up again)
     links = extract_next_links(url, resp)
     return [link for link in links if is_valid(link)]
 

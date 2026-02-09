@@ -8,13 +8,15 @@ from crawler import Crawler
 from scraper import write_statistics, unique_urls, unique_subdomains, word_count
 
 def main(config_file, restart):
-    cparser = ConfigParser()
-    cparser.read(config_file)
-    config = Config(cparser)
-    config.cache_server = get_cache_server(config, restart)
-    crawler = Crawler(config, restart)
-    crawler.start()
-    write_statistics()
+    try:
+        cparser = ConfigParser()
+        cparser.read(config_file)
+        config = Config(cparser)
+        config.cache_server = get_cache_server(config, restart)
+        crawler = Crawler(config, restart)
+        crawler.start()
+    finally:
+        write_statistics()
 
 
 if __name__ == "__main__":

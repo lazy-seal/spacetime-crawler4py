@@ -4,29 +4,43 @@ from bs4 import BeautifulSoup
 from pprint import pprint
 from collections import defaultdict
 
+stopwords = set(('I', 'a', 'about', 'an', 'are', 'as', 'at', 'by',
+             'com', 'for', 'from', 'how', 'in', 'is', 'it', 'of',
+             'on', 'that', 'the', 'this', 'to', 'was', 'what', 'when',
+             'where', 'and', 'who', 'will', 'with', 'with', 'the', 'www'))
+from pprint import pprint
+
 unique_urls: set[str]               = set()
 unique_subdomains: dict[str, int]   = defaultdict(int)
-word_count: dict[str, int]          = {}
+prohibited_paths: dict[str, list[str]]            = {}
+word_count: dict[str, int]          = defaultdict(int)
+longest_page: list                  = ['', 0]     # [url, number of words]
 
 def write_statistics():
     """Writes statistics required for the report in report.txt"""
-    a = sorted(word_count)
+    top_words = sorted(word_count.items(), key=lambda item: item[1], reverse=True)
 
     with open("report.txt", 'w', encoding='utf-8') as file:
         # 1. how many unique pages did you find?
         file.write(f"1. Number of Unique URLs: {len(unique_urls)}\n")
 
         # 2. 
-        file.write(f"2. Longest page: {max(word_count, key=lambda item: item[1])}\n")
+        file.write(f"2. Longest page: {longest_page[0], longest_page[1]}\n")
 
         # 3. 
+        file.write(f"3. 200 most common words:\n")
+        i = 0
+        for word in top_words:
+            i += 1
+            file.write(f"\t{word}: {word_count[word]}\n")
+            if i >= 200:
+                break
 
         # 4. how many unique subdomains
         sorted_unique_subdomains = sorted(unique_subdomains.items(), key=lambda item: (item[0], item[1]))
         file.write(f"4. Unique Subdomains:\n")
-        for subdomain, cnt in sorted_unique_subdomains:
-            file.write(f"\t{subdomain}: {int(cnt)}\n")
-
+        for subdomain  in sorted_unique_subdomains:
+            file.write(f"\t{subdomain}\n")
 
 
 def scraper(url, resp):
@@ -38,26 +52,28 @@ def scraper(url, resp):
         print('page without content')
         return []
 
+    parsed = urlparse(url)
+    parsed = parsed._replace(fragment='')
+
     # getting wordcount
     soup = BeautifulSoup(resp.raw_response.content, 'html.parser')
     paragraph = soup.get_text()
-    token_list = tokenize(url, paragraph)
+    token_list = tokenize(parsed.geturl(), paragraph)
+
+    # page length
+    if len(token_list) > longest_page[1]:
+        longest_page[0] = url
+        longest_page[1] = len(token_list)
 
     # getting statistics
-    parsed = urlparse(url)
-    unique_urls.add(parsed._replace(fragment='').geturl())      # no fragment
-    unique_subdomains[parsed._replace(fragment='').netloc] += 1
-
-    # only visit 100 pages for the test
-    if len(unique_urls) > 100:
-        return []
+    unique_urls.add(parsed.geturl())      # no fragment
+    unique_subdomains[parsed.netloc] += 1
 
     links = extract_next_links(url, resp)
     return [link for link in links if is_valid(link)]
 
 
-def tokenize(url, raw_words) -> list:
-
+def tokenize(url, raw_words) -> list[str]:
     #lowercase all char to be lowercase to deal with edge cases
     lowercase = raw_words.casefold()
     
@@ -66,26 +82,20 @@ def tokenize(url, raw_words) -> list:
 
     #check current char for valid alpha-numerical, then add it to tmp list until non-valid char. Then add complete string to list
     for char in lowercase:
-        if char.isascii() and char.isalnum():
+        if char.isalnum():
             tmp_word.append(char)
         elif char == "'" or char == "-":
             continue
         else:
             if tmp_word:
                 new_word = "".join(tmp_word)
-                token_list.append(new_word)
+                if new_word not in stopwords:
+                    token_list.append(new_word)
+                    word_count[new_word] += 1
                 tmp_word = []
-                
-    word_count[url] = len(token_list)
-    
+
     return token_list
 
-def printMostWordUrl(word_count):
-    max_url = max(word_count, key=lambda item: item[1])
-    max_count = word_count[max_url]
-    
-    print(f"Max URL: {max_url} with {max_count} words")
-        
 def extract_next_links(url, resp):
     # Implementation required.
     # url: the URL that was used to get the page
@@ -108,8 +118,8 @@ def extract_next_links(url, resp):
     for link in soup.find_all('a'):
         href = link.get('href')
         if href and is_valid(href):
-            # @TODO: I might also want to check if the page has a low information value
-            urls.append(href)
+            parsed = urlparse(href)._replace(fragment='')
+            urls.append(parsed.geturl())
 
     return urls
 
@@ -137,34 +147,34 @@ def is_valid(url):
                 ics_paths[3] not in parsed.hostname:
             return False
 
-        
-        # links to avoid 
-        traps = ('isg.ics.uci.edu/events/tag/talk',)
+        # traps to avoid 
+        traps = ('isg.ics.uci.edu/events/tag/talk',
+                 'gitlab.ics', 
+                 'grape.ics',
+                 '/events/',
+                 '/people/')
         for trap in traps:
             if trap in parsed.geturl():
                 return False
-        
-        # avoidng textbook because we don't really need all textbook content from information retreival perspective
-        textbooks = ('www.ics.uci.edu/~wjohnson/BIDA',)
+
+        # avoid gitlab repo
+        if 'gitlab.ics.uci.edu' in parsed.geturl():
+            return False
+
+        # low value info like textbook
+        textbooks = ('www.ics.uci.edu/~wjohnson/BIDA','ngs.ics.edu/author/')
         for textbook in textbooks:
             if textbook in parsed.geturl():
                 return False
-
-        # '.edu/people/...' always gives 608 and is redundant with '.edu/?people=...'
-        if 'ics.uci.edu/people/' in parsed.geturl():
-            return False
-
-        # check for robots.txt
-        # NeedToImplement
 
         return not re.match(
                     r".*\.(css|js|bmp|gif|jpe?g|ico"
                     + r"|png|tiff?|mid|mp2|mp3|mp4"
                     + r"|wav|avi|mov|mpeg|ram|m4v|mkv|ogg|ogv|pdf"
-                    + r"|ps|eps|tex|ppt|pptx|doc|docx|xls|xlsx|names"
+                    + r"|ps|eps|tex|ppt|pptx|ppsx|doc|docx|xls|xlsx|names|html"
                     + r"|data|dat|exe|bz2|tar|msi|bin|7z|psd|dmg|iso"
                     + r"|epub|dll|cnf|tgz|sha1"
-                    + r"|thmx|mso|arff|rtf|jar|csv"
+                    + r"|thmx|mso|arff|rtf|jar|csv|txt"
                     + r"|rm|smil|wmv|swf|wma|zip|rar|gz)$", parsed.path.lower())
     except Exception as e:
         print ("Error for ", parsed)
